@@ -1,12 +1,6 @@
 # KRAMER-SWITCH
 
-Native Android remote app for the Kramer VS-81H 8x1 HDMI switcher.
-
-### By complicatiion aka sksdesign aka sven404 17.05.2026
-
-# Note!
-
-You don't have to build the app yourself; you can find a pre-built APK on the right under "Releases" as an APK package.
+Android remote app for the Kramer VS-81H 8x1 HDMI switcher
 
 ## Target Device
 
@@ -101,7 +95,7 @@ The switch is expected to reply with the same command with the destination/reply
 ## Important notes
 
 - Android and the VS-81H must be able to reach each other directly on TCP port `5000`.
-- Some Kramer units can disable replies. If your switch performs the action but the app reports a missing reply, disable **Antwort prüfen** in settings.
+- Some Kramer units can disable replies. If your switch performs the action but the app reports a missing reply, disable **Validate replies** in settings.
 - The active input can be read through a Protocol 2000 status request. If the device firmware does not answer this request reliably, the app still tracks the last successfully switched input.
 - Android cannot fully clear its own app storage like the system settings screen can. The app reset clears its SharedPreferences, cached data and stored active-input state.
 
@@ -145,5 +139,4 @@ By using, copying, modifying, or redistributing this project, you agree to the t
 Copyright (c) 2026 complicatiion aka sksdesign aka sven404 All rights reserved unless explicitly granted below or otherwise mentioned/licensed, or generally based on an open-source license.
 
 
-
-
+### By complicatiion aka sksdesign aka sven404 17.05.2026
