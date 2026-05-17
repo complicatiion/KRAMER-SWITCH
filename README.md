@@ -4,6 +4,10 @@ Native Android remote app for the Kramer VS-81H 8x1 HDMI switcher.
 
 ### By complicatiion aka sksdesign aka sven404 17.05.2026
 
+# Note!
+
+You don't have to build the app yourself; you can find a pre-built APK on the right under "Releases" as an APK package.
+
 ## Target Device
 
 - Model: Kramer VS-81H
