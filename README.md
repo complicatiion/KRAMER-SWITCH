@@ -15,6 +15,14 @@ Native Android remote app for the Kramer VS-81H 8x1 HDMI switcher.
 
 The app sends raw 4-byte Kramer Protocol 2000 packets. It does not use HTTP, REST or a browser-based web API.
 
+## Previews
+
+![Preview 1](preview/preview1.jpg)
+![Preview 2](preview/preview2.jpg)
+![Preview 3](preview/preview3.jpg)
+![Preview 4](preview/preview4.jpg)
+![Preview 5](preview/preview5.jpg)
+
 ## Features
 
 - 8 HDMI input buttons for VS-81H input 1-8
