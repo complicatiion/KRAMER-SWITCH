@@ -17,7 +17,6 @@ The app sends raw 4-byte Kramer Protocol 2000 packets. It does not use HTTP, RES
 
 ## Previews
 
-![Preview 1](preview/preview1.jpg)
 ![Preview 2](preview/preview2.jpg)
 ![Preview 3](preview/preview3.jpg)
 ![Preview 4](preview/preview4.jpg)
