@@ -1,7 +1,10 @@
 package de.sksdesign.kramerswitch.data
 
 import android.content.Context
+import android.net.Uri
 import de.sksdesign.kramerswitch.core.KramerProtocol
+import org.json.JSONArray
+import org.json.JSONObject
 
 data class AppSettings(
     val deviceName: String = "Kramer VS-81H",
@@ -82,4 +85,71 @@ object AppSettingsStore {
     }
 
     private fun String?.orDefault(default: String): String = this?.takeIf { it.isNotBlank() } ?: default
+}
+
+
+object AppSettingsFile {
+    private const val FORMAT = "KRAMER_SWITCH_SETTINGS"
+    private const val EXPORT_VERSION = 1
+
+    fun writeToUri(context: Context, uri: Uri, settings: AppSettings): Boolean {
+        return runCatching {
+            context.contentResolver.openOutputStream(uri, "wt")?.use { output ->
+                output.write(toJson(settings).toByteArray(Charsets.UTF_8))
+            } ?: error("Could not open output stream")
+        }.isSuccess
+    }
+
+    fun readFromUri(context: Context, uri: Uri): AppSettings? {
+        return runCatching {
+            val json = context.contentResolver.openInputStream(uri)?.use { input ->
+                input.bufferedReader(Charsets.UTF_8).readText()
+            } ?: return null
+            fromJson(json)
+        }.getOrNull()
+    }
+
+    fun toJson(settings: AppSettings): String {
+        val labels = JSONArray()
+        settings.inputLabels.take(8).forEachIndexed { index, label ->
+            labels.put(label.trim().ifEmpty { "HDMI ${index + 1}" })
+        }
+
+        return JSONObject()
+            .put("format", FORMAT)
+            .put("version", EXPORT_VERSION)
+            .put("deviceName", settings.deviceName.trim().ifEmpty { "Kramer VS-81H" })
+            .put("ipAddress", settings.ipAddress.trim().ifEmpty { KramerProtocol.DEFAULT_IP })
+            .put("port", settings.port.coerceIn(1, 65535))
+            .put("timeoutMs", settings.timeoutMs.coerceIn(300, 10000))
+            .put("machineNumber", settings.machineNumber.coerceIn(1, 31))
+            .put("requireReply", settings.requireReply)
+            .put("inputLabels", labels)
+            .toString(2)
+    }
+
+    fun fromJson(json: String): AppSettings {
+        val root = JSONObject(json)
+        val format = root.optString("format", FORMAT)
+        require(format == FORMAT) { "Unsupported settings file" }
+
+        val labelsJson = root.optJSONArray("inputLabels")
+        val labels = List(8) { index ->
+            labelsJson
+                ?.optString(index, "HDMI ${index + 1}")
+                ?.trim()
+                ?.ifEmpty { "HDMI ${index + 1}" }
+                ?: "HDMI ${index + 1}"
+        }
+
+        return AppSettings(
+            deviceName = root.optString("deviceName", "Kramer VS-81H").trim().ifEmpty { "Kramer VS-81H" },
+            ipAddress = root.optString("ipAddress", KramerProtocol.DEFAULT_IP).trim().ifEmpty { KramerProtocol.DEFAULT_IP },
+            port = root.optInt("port", KramerProtocol.DEFAULT_PORT).coerceIn(1, 65535),
+            timeoutMs = root.optInt("timeoutMs", KramerProtocol.DEFAULT_TIMEOUT_MS).coerceIn(300, 10000),
+            machineNumber = root.optInt("machineNumber", KramerProtocol.DEFAULT_MACHINE_NUMBER).coerceIn(1, 31),
+            requireReply = root.optBoolean("requireReply", true),
+            inputLabels = labels
+        )
+    }
 }

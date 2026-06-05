@@ -1,3 +1,5 @@
+![KRAMER-SWITCH](/preview/favicon.png)
+
 # KRAMER-SWITCH
 
 Android remote app for the Kramer VS-81H 8x1 HDMI switcher
@@ -124,6 +126,12 @@ See further details in:
 
 LICENSE.md
 
+## Note
+
+By using, copying, modifying, or redistributing this project, you agree to the terms of this license.
+
+Copyright (c) 2026 complicatiion aka sksdesign aka sven404 All rights reserved unless explicitly granted below or otherwise mentioned/licensed, or generally based on an open-source license.
+
 
 ## Disclaimer
 
@@ -131,12 +139,6 @@ KRAMER-SWITCH is an unofficial hobby project and is not affiliated with, endorse
 
 This app was created as a private/community tool to control a Kramer VS-81H HDMI switch over the local network. All product names, trademarks, and brands belong to their respective owners.
 
-
-## Note
-
-By using, copying, modifying, or redistributing this project, you agree to the terms of this license.
-
-Copyright (c) 2026 complicatiion aka sksdesign aka sven404 All rights reserved unless explicitly granted below or otherwise mentioned/licensed, or generally based on an open-source license.
-
+---
 
 ### By complicatiion aka sksdesign aka sven404 17.05.2026

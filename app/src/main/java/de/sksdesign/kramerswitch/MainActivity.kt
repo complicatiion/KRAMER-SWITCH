@@ -1,9 +1,12 @@
 package de.sksdesign.kramerswitch
 
 import android.content.Context
+import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -16,7 +19,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.DeleteSweep
 import androidx.compose.material.icons.rounded.PowerSettingsNew
 import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.material.icons.rounded.Router
@@ -37,6 +39,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
@@ -63,6 +66,7 @@ import androidx.core.view.WindowCompat
 import de.sksdesign.kramerswitch.core.KramerClient
 import de.sksdesign.kramerswitch.core.KramerProtocol
 import de.sksdesign.kramerswitch.data.AppSettings
+import de.sksdesign.kramerswitch.data.AppSettingsFile
 import de.sksdesign.kramerswitch.data.AppSettingsStore
 import kotlinx.coroutines.launch
 
@@ -103,6 +107,35 @@ private fun KramerSwitchRoot() {
     var connectionState by remember { mutableStateOf(ConnectionState.Idle) }
     var showSettings by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
+
+    val exportSettingsLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.CreateDocument("application/json")
+    ) { uri: Uri? ->
+        if (uri != null) {
+            val ok = AppSettingsFile.writeToUri(context, uri, settings)
+            lastMessage = if (ok) "Settings exported" else "Export failed"
+            connectionState = if (ok) ConnectionState.Idle else ConnectionState.Error
+        }
+    }
+
+    val importSettingsLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.OpenDocument()
+    ) { uri: Uri? ->
+        if (uri != null) {
+            val imported = AppSettingsFile.readFromUri(context, uri)
+            if (imported != null) {
+                settings = imported
+                AppSettingsStore.save(context, imported)
+                connectionState = ConnectionState.Idle
+                lastMessage = "Settings imported"
+                showSettings = false
+            } else {
+                connectionState = ConnectionState.Error
+                lastMessage = "Import failed"
+            }
+        }
+    }
+
 
     fun createClient(): KramerClient = KramerClient(
         host = settings.ipAddress,
@@ -195,12 +228,6 @@ private fun KramerSwitchRoot() {
                         onOpenSettings = { showSettings = true }
                     )
 
-                    ControlPanel(
-                        settings = settings,
-                        activeInput = activeInput,
-                        onSwitchInput = ::switchInput
-                    )
-
                     Column(
                         modifier = Modifier.fillMaxWidth(),
                         verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -230,6 +257,12 @@ private fun KramerSwitchRoot() {
                         )
                     }
 
+                    ControlPanel(
+                        settings = settings,
+                        activeInput = activeInput,
+                        onSwitchInput = ::switchInput
+                    )
+
                     DiagnosticsCard(settings = settings, lastReply = lastReply)
                 }
             }
@@ -250,6 +283,12 @@ private fun KramerSwitchRoot() {
             onClearCache = {
                 val ok = clearAppCache(context)
                 lastMessage = if (ok) "Cache cleared" else "Cache could not be fully cleared"
+            },
+            onExportSettings = {
+                exportSettingsLauncher.launch("kramer-switch-settings.json")
+            },
+            onImportSettings = {
+                importSettingsLauncher.launch(arrayOf("application/json", "text/*", "*/*"))
             },
             onResetApp = {
                 AppSettingsStore.clearSettings(context)
@@ -282,24 +321,29 @@ private fun HeaderCard(
                 painter = painterResource(id = R.drawable.kramer_logo),
                 contentDescription = "KRAMER-SWITCH Logo",
                 contentScale = ContentScale.Fit,
-                modifier = Modifier.size(58.dp)
+                modifier = Modifier.size(52.dp)
             )
-            Spacer(modifier = Modifier.width(14.dp))
-            Column(modifier = Modifier.weight(1f)) {
+            Spacer(modifier = Modifier.width(10.dp))
+            Column(
+                modifier = Modifier.weight(1f),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
                 Text(
-                    text = "KRAMER-SWITCH",
+                    text = "SWITCH",
                     color = TextPrimary,
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.ExtraBold,
                     maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+                    overflow = TextOverflow.Clip,
+                    textAlign = TextAlign.Center
                 )
                 Text(
                     text = settings.deviceName,
                     color = TextSecondary,
                     style = MaterialTheme.typography.bodyMedium,
                     maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis,
+                    textAlign = TextAlign.Center
                 )
             }
             IconButton(onClick = onOpenSettings) {
@@ -427,7 +471,7 @@ private fun DiagnosticsCard(settings: AppSettings, lastReply: String?) {
     GlassCard {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(Icons.Rounded.Router, contentDescription = null, tint = LogoBlueSoft)
-            Spacer(modifier = Modifier.width(10.dp))
+            Spacer(modifier = Modifier.width(8.dp))
             Text(
                 text = "Connection",
                 color = TextPrimary,
@@ -547,6 +591,8 @@ private fun SettingsDialog(
     onDismiss: () -> Unit,
     onSave: (AppSettings) -> Unit,
     onClearCache: () -> Unit,
+    onExportSettings: () -> Unit,
+    onImportSettings: () -> Unit,
     onResetApp: () -> Unit
 ) {
     var deviceName by remember { mutableStateOf(settings.deviceName) }
@@ -648,7 +694,18 @@ private fun SettingsDialog(
                         Text("Validate replies", color = TextPrimary, fontWeight = FontWeight.Bold)
                         Text("Recommended: enabled. The switch confirms valid commands with a 4-byte reply.", color = TextSecondary, style = MaterialTheme.typography.bodySmall)
                     }
-                    Switch(checked = requireReply, onCheckedChange = { requireReply = it })
+                    Switch(
+                        checked = requireReply,
+                        onCheckedChange = { requireReply = it },
+                        colors = SwitchDefaults.colors(
+                            checkedThumbColor = Color.White,
+                            checkedTrackColor = LogoBlue,
+                            checkedBorderColor = LogoBlueSoft,
+                            uncheckedThumbColor = TextSecondary,
+                            uncheckedTrackColor = Color(0xFF18213A),
+                            uncheckedBorderColor = Color.White.copy(alpha = 0.22f)
+                        )
+                    )
                 }
 
                 HorizontalDivider(color = Color.White.copy(alpha = 0.10f))
@@ -665,32 +722,54 @@ private fun SettingsDialog(
                 }
 
                 HorizontalDivider(color = Color.White.copy(alpha = 0.10f))
+                Text("Backup & restore", color = TextPrimary, fontWeight = FontWeight.Bold)
+                Text(
+                    text = "Export your saved switch settings as JSON or import them on another device.",
+                    color = TextSecondary,
+                    style = MaterialTheme.typography.bodySmall
+                )
                 Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
                     OutlinedButton(
                         modifier = Modifier.weight(1f),
+                        onClick = onExportSettings,
+                        shape = RoundedCornerShape(16.dp),
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = TextPrimary)
+                    ) {
+                        Text("Export")
+                    }
+                    OutlinedButton(
+                        modifier = Modifier.weight(1f),
+                        onClick = onImportSettings,
+                        shape = RoundedCornerShape(16.dp),
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = TextPrimary)
+                    ) {
+                        Text("Import")
+                    }
+                }
+
+                HorizontalDivider(color = Color.White.copy(alpha = 0.10f))
+                Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
+                    OutlinedButton(
+                        modifier = Modifier.weight(1f).heightIn(min = 48.dp),
                         onClick = onClearCache,
                         shape = RoundedCornerShape(16.dp),
                         colors = ButtonDefaults.outlinedButtonColors(contentColor = TextPrimary)
                     ) {
-                        Icon(Icons.Rounded.DeleteSweep, contentDescription = null, modifier = Modifier.size(18.dp))
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Text("Clear Cache")
+                        Text("Clear")
                     }
                     OutlinedButton(
-                        modifier = Modifier.weight(1f),
+                        modifier = Modifier.weight(1f).heightIn(min = 48.dp),
                         onClick = onResetApp,
                         shape = RoundedCornerShape(16.dp),
                         colors = ButtonDefaults.outlinedButtonColors(contentColor = TextPrimary)
                     ) {
-                        Icon(Icons.Rounded.DeleteSweep, contentDescription = null, modifier = Modifier.size(18.dp))
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Text("Reset App")
+                        Text("Reset")
                     }
                 }
 
                 Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
                     OutlinedButton(
-                        modifier = Modifier.weight(1f),
+                        modifier = Modifier.weight(1f).heightIn(min = 48.dp),
                         onClick = onDismiss,
                         shape = RoundedCornerShape(16.dp),
                         colors = ButtonDefaults.outlinedButtonColors(contentColor = TextPrimary)
@@ -698,7 +777,7 @@ private fun SettingsDialog(
                         Text("Cancel")
                     }
                     ElevatedButton(
-                        modifier = Modifier.weight(1f),
+                        modifier = Modifier.weight(1f).heightIn(min = 48.dp),
                         onClick = {
                             onSave(
                                 AppSettings(
