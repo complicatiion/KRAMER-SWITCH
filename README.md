@@ -1,118 +1,141 @@
-![MusicMonster](/preview/favicon.png)
+![KRAMER-SWITCH](/preview/favicon.png)
 
-# MusicMonster
+# KRAMER-SWITCH
 
-**A customizable, local-first music player for Android and Android TV.**
+**A local network remote control for Kramer HDMI switchers on Android and Android TV.**
 
-MusicMonster brings your personal music collection together in one place. Browse albums, tracks, artists, genres and folders; manage favorites and playlists; and enjoy music through a compact Mini Player or a full-screen player with artwork, playback controls and optional audio visualization. Local files remain on your device or selected storage location—MusicMonster does not provide or bundle music.
+KRAMER-SWITCH lets you select HDMI inputs and check the connection to a compatible Kramer video switcher directly from your phone, tablet or Android TV. It is designed for straightforward **one-output HDMI switching** over your local network, with customizable device profiles, input labels, connection settings and a TV-friendly widescreen interface. No cloud account or external control service is required.
 
-![MusicMonster](/preview/preview-collage.png)
+![KRAMER-SWITCH](/preview/preview-collage.png)
+
+*Documented app version: **1.2.7***
 
 ## Highlights
 
-- **Personal music library** — Browse albums, tracks, folders, genres, artists, podcasts, soundtracks (OST) and custom collections.
-- **Local and network music** — Scan music stored on your device or access network folders, including NAS/SMB shares exposed through compatible Android document providers.
-- **Flexible playback** — Mini Player, Big Player, playback queue, shuffle, repeat, favorites and Android media-notification controls.
-- **Android Auto and TV support** — Car-friendly playback integration, landscape layouts, D-pad/remote navigation and keyboard shortcuts.
-- **Personalized appearance** — AMOLED and Light modes, accent colors, Glass/Balanced/Solid surfaces, live blur where supported, ambient glow and adjustable borders.
-- **Library management** — Automatic or manual scanning, customizable section visibility, saved playlists, favorites, play counts and listening history.
-- **Built-in utilities** — Sleep Timer, equalizer, Big Player visualizer, settings backup and contextual music-file actions.
+- **One-tap HDMI switching** — Route a selected HDMI input to the switcher's single output.
+- **Kramer VS-81H support** — Start with the built-in 8-input VS-81H profile or choose another compatible one-output profile.
+- **Flexible input configuration** — Use predefined 2-, 4-, 8- and 16-input profiles or a custom one-output configuration with personalized HDMI labels.
+- **Connection tools** — Test network connectivity, refresh the reported active input and view status messages and the last protocol reply.
+- **Android and Android TV** — Portrait and widescreen layouts with D-pad, keyboard and compatible TV remote navigation.
+- **Persistent settings** — Save network details, device preferences, input labels and the chosen display mode locally.
+- **Backup and restore** — Export settings as JSON or import a saved configuration on another device.
+- **Offline legal information** — Review the EULA, Privacy Policy and Legal Notice on first launch and reopen them from the app's information screen.
 
 ## Navigation
 
 | Section | What you'll find |
 | --- | --- |
-| **Home** | Discovery, Favorites, History, Top and personalized library shortcuts. |
-| **Library** | Albums, Tracks, Folders, Genres, Artists, Podcasts, OST and optional custom or web collections. |
-| **Search** | Search across your indexed music library. |
-| **Playlists** | Create, manage, import and export playlists. |
-| **Settings** | Appearance, library sources, playback, automation, remote controls, imports/exports and app information. |
+| **Main screen** | Current device, connection state, active-input indication and status messages. |
+| **HDMI Inputs** | Buttons for each available input, using the configured names. |
+| **Quick Actions** | Test Connection, Refresh Status and Power Off. |
+| **Connection** | Device model, I/O configuration, network target, machine number, timeout, reply validation and last reply. |
+| **Settings** | Device profile, network settings, HDMI labels, display mode, JSON backup/restore and maintenance options. |
+| **About / Information** | App version and build type, author, external links and the legal information viewer. |
 
-Home and Library sections can be reordered or individually hidden in Settings without deleting the underlying music data.
+## Getting Started
 
-## Music Library
+1. Connect your compatible Kramer HDMI switcher and Android device to the same reachable local network.
+2. Make sure the switcher's TCP control interface is enabled and note its IP address and port.
+3. Start KRAMER-SWITCH and review the legal information. Choose **Accept** to continue.
+4. Open **Settings** using the gear icon.
+5. Select your **Device profile**, check the IP address and TCP port, and save the configuration.
+6. Select **Test Connection** to check whether the device can be reached.
+7. Tap an **HDMI Input** button to route that source to the output.
 
-### Local collections
+For the default **Kramer VS-81H** profile, the initial network values are `192.168.1.39` and TCP port `5000`. Change them if your switch uses a different network configuration.
 
-MusicMonster works with Android's media library and folders selected by the user. Separate locations can be used for the main music collection, podcasts, soundtracks and custom folders. Manual rescans and configurable automatic scanning help keep the library up to date.
+## HDMI Switching & Connection Tools
 
-Tracks are organized using available audio metadata, including titles, artists, albums and genres. Album art is displayed where available, with an in-app fallback when artwork is missing.
+### HDMI Inputs
 
-### Network collections
+The main screen displays the available HDMI inputs according to the selected profile. Each button can have a custom label so sources are easier to recognize—for example, a receiver, console or media player. The active-input indicator is updated from supported device replies or, when reply validation is disabled, from the command sent by the app.
 
-MusicMonster can browse music from mounted network locations using a compatible Android document provider, such as an SMB-capable file manager. Network music remains on the share; the app retains a **local metadata index** so your library entries remain visible when a NAS or network share is temporarily offline.
+### Quick Actions
 
-**An offline index is not an offline audio copy:** streaming or playing a file still requires access to the original network location. Network sources can be rescanned to discover library changes.
+- **Test Connection:** Attempts a TCP connection to the configured switcher. It checks reachability, not whether an HDMI signal is present.
+- **Refresh Status:** Requests the current input selection from the switcher using Kramer Protocol 2000.
+- **Power Off:** Sends the protocol command to **disconnect the video output**. It does **not** physically switch off the device's mains power.
 
-### Favorites, history and playlists
+Connection feedback such as **Ready**, **Connected**, **Working** or a timeout/error message appears on the main screen. The **Connection** card also shows configuration details and the last received protocol reply, when available.
 
-Mark individual tracks or groups of tracks as favorites, revisit listening history, and organize music into playlists. The playback queue supports adding music as you browse. Favorites, playlists and library preferences are saved locally.
+## Device Profiles & Settings
 
-## Playback
+KRAMER-SWITCH includes the following configurations:
 
-MusicMonster provides several ways to control playback:
+| Device profile | Inputs | Outputs |
+| --- | ---: | ---: |
+| Kramer VS-81H | 8 | 1 |
+| Generic Kramer 2x1 | 2 | 1 |
+| Generic Kramer 4x1 | 4 | 1 |
+| Generic Kramer 8x1 | 8 | 1 |
+| Generic Kramer 16x1 | 16 | 1 |
+| Custom one-output switcher | Configurable, 1–16 | 1 |
 
-- **Mini Player:** quick access to the current track while browsing.
-- **Big Player:** large album artwork, track information, interactive seek bar, shuffle, repeat, favorites and playback controls.
-- **Notification Player:** playback controls through Android's system media notification.
-- **Android Auto:** media controls and configurable phone-screen behavior when an Android Auto connection is detected.
+Generic and custom profiles are intended for switchers that use the **compatible Kramer Protocol 2000 command format**. They do not guarantee compatibility with every Kramer product or firmware version. **Matrix routing and multiple-output control are not supported.**
 
-The Big Player supports **swiping the cover** to skip tracks and **double-tapping** to toggle a favorite, with a short visual confirmation. Smooth transitions and animations can be customized or disabled.
+Settings let you configure the device name and model, input count, IP address, TCP port, command timeout, machine number and input labels. **Validate replies** is enabled by default: the app checks for a matching response before confirming a switching command. If disabled, a command can be reported as sent without confirmation from the switch.
 
-### Audio tools
+Use **Clear** to clear cached app data, or **Reset** to restore the app's initial settings. Resetting the app also clears its recorded legal acceptance, so the first-start information screen will appear again.
 
-- **Equalizer:** audio adjustment controls integrated into the player.
-- **Audio Visualizer:** optional spectrum, bar and waveform-inspired styles in the Big Player only. Android may request audio-capture permission to enable visualization.
-- **Sleep Timer:** choose a preset or custom duration to pause playback automatically, with an optional display-timeout behavior.
-- **Always On Display:** keep the screen awake manually or conditionally when Android Auto is connected.
+## Android TV & Remote Control
 
-## Track and Folder Actions
+KRAMER-SWITCH provides a dedicated widescreen layout for larger screens and Android TV. The app includes an Android TV launcher entry and banner, so it can appear in compatible TV launchers.
 
-Press and hold supported tracks, albums or folders to open a compact action menu. Available actions depend on the selected item and its storage permissions and may include favorites, queue or playlist actions, equalizer access, sharing and deletion.
+The **Display mode** setting provides three choices:
 
-A lightweight **MP3 ID3 tag editor** supports basic fields such as title, artist, album and genre for compatible, writable local MP3 files. Batch editing is available for supported album and folder selections. Android may ask you to confirm file modifications or deletion. Network sources and read-only document providers may restrict these actions.
+- **Auto:** Selects the layout based on available screen dimensions and orientation.
+- **Smartphone / portrait:** Uses the compact phone-style layout.
+- **TV / landscape:** Uses the widescreen TV-style layout.
 
-## Appearance & Personalization
+You can operate the interface by touch, keyboard or a compatible Android TV remote. Standard D-pad directions navigate focusable controls, while **OK / Enter** activates the selected control. The app also includes the following keyboard shortcuts:
 
-MusicMonster combines Material-inspired navigation with extensive visual customization:
+| Key | Action |
+| --- | --- |
+| **Arrow keys / D-pad** | Navigate focusable controls. |
+| **Enter / OK** | Activate the focused button or control. |
+| **Back / Escape** | Close Settings or return from a dialog where supported. |
+| **Menu / Settings** | Open the Settings screen where the key is supported by the device. |
+| **1–9** | Select the corresponding HDMI input, if present. |
+| **0** | Select HDMI input 10, if the configured profile includes it. |
 
-- **AMOLED MODE** and **LIGHT MODE**.
-- Preset and custom **accent colors**.
-- **Solid**, **Balanced** and **Glass** card styles with adjustable transparency and background intensity.
-- Live background blur on supported devices, including navigation surfaces and supported overlay menus, with a readable fallback where blur is unavailable.
-- Optional **card borders**, including opacity and accent-color settings.
-- **Ambient Glow**, animations and adjustable transition speed.
-- Customizable navigation and player-control appearance.
-- Landscape and TV layout adjustments, including UI scale and album-grid density.
+Remote key behavior and focus handling may vary with the Android TV device, launcher and remote model.
 
-The interface is designed for touch interaction while also supporting keyboards, D-pads and compatible TV/IR remotes. Focus highlights help identify the selected control on larger screens.
+## Backup & Restore
 
-## Import & Export
+Use **Export** in Settings to create a local JSON file containing the selected device profile, network configuration, display mode, input count and custom HDMI labels. Use **Import** to load a previously exported configuration.
 
-MusicMonster offers local backup and transfer options for **settings, favorites and playlists**. Settings and favorites use MusicMonster's `.mm` file extension for their structured backup data; playlist collections can be exported together as a ZIP archive. These exports are for app data and playlist information, **not copies of the original music files**.
+These backups contain **app settings**, not device firmware, HDMI media or a copy of the switcher's internal configuration. The imported settings are stored locally on the Android device.
 
 ## Privacy & Permissions
 
-MusicMonster is built around personal and local music collections. No cloud account is required for local playback. Library information and preferences are kept on the device, while audio files remain in their original storage locations.
+KRAMER-SWITCH communicates directly with the configured switcher over **TCP/IP on your local network**. It does not require registration, a cloud account, analytics or third-party control services. Local settings and the legal acceptance state are stored on the device.
 
-Certain features require Android permissions—for example, local media access, selected folders or audio visualization. Optional web-library entries may open third-party services, which follow their own availability, sign-in requirements and privacy policies. MusicMonster is not affiliated with those services.
+Android network permissions are required to reach the HDMI switcher. Opening a GitHub or website link from the About card may launch an external browser; the destination site's own privacy terms then apply.
 
-On first use, MusicMonster displays its legal information for acceptance. The **EULA, Privacy Policy, Legal Notice and Copyright information** remain accessible through the in-app information screen.
+On first launch, the app presents the **EULA, Privacy Policy and Legal Notice** for acceptance. You can reopen the information view later through the **i** button in the About card. The legal documents are bundled with the application and can be read without an internet connection. The project also includes a separate Copyright notice:
+
+- [EULA](legal/EULA.md)
+- [Privacy Policy](legal/PRIVACY_POLICY.md)
+- [Legal Notice](legal/LEGAL_NOTICE.md)
+- [Copyright](legal/COPYRIGHT.md)
 
 ## Important Notes
 
-- MusicMonster does not include or distribute music files.
-- You are responsible for having the necessary rights to the audio you play or manage.
-- Available audio formats, artwork, network connectivity and media access can vary by device, storage provider and file metadata.
-- Offline library visibility does not guarantee offline playback of network-hosted files.
-- Editing tags and deleting files modify the original audio collection; keep backups of important files.
-- Some visual effects and Android Auto/TV features depend on device and system support.
+- KRAMER-SWITCH is a **remote controller**, not an HDMI video player, streaming service or signal converter.
+- The Android device and switcher must have working network connectivity for control commands to succeed.
+- **Power Off** disconnects the switcher's video output; it is not a hardware power switch.
+- The connection test does not verify video signal quality or active HDMI sources.
+- Only **single-output switching** is implemented; Kramer matrix devices are outside the current feature scope.
+- Kramer Protocol 2000 traffic is sent over a direct TCP connection. Use the app on a trusted local network rather than exposing the switcher's control port to the public internet.
+- Generic profiles and TV remote behavior depend on the capabilities of the connected hardware.
 
 ## Project & Copyright
 
-MusicMonster is a personal software project by **Sven Klocke** (*complicatiion / sksdesign*).
+KRAMER-SWITCH is an independent, non-commercial hobby project by **Sven Klocke** (*complicatiion / sksdesign*).
 
-**Project repository:** [github.com/complicatiion/musicmonster_app](https://github.com/complicatiion/musicmonster_app)  
+**GitHub profile:** [github.com/complicatiion](https://github.com/complicatiion)  
 **Website:** [sksdesign.de](https://sksdesign.de)
 
-Copyright © 2026 Sven Klocke. All rights reserved. Usage, redistribution and third-party component licenses are governed by their respective license notices and the legal documents supplied with the application.
+KRAMER-SWITCH is **not affiliated with, endorsed by or sponsored by Kramer Electronics Ltd. or any related company**. All trademarks, product names and brands belong to their respective owners.
+
+Copyright © 2026 Sven Klocke. All rights reserved. Software usage, redistribution and third-party component rights are governed by the applicable legal notices supplied with the project.
